@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
+#include <linux/delay.h>
 #include "memx_xflow.h"
 #include "memx_pcie.h"
 #include "memx_fw_cmd.h"
@@ -12,6 +13,47 @@ static int memx_wait_for_firmware_msix_ack(struct memx_pcie_dev *memx_dev)
 
 	if (!memx_dev || !memx_dev->pDev) {
 		pr_err("memryx: wait_for_fw_ack: failed with -ENODEV\n");
+		return -ENODEV;
+	}
+
+		/*
+	 * Legacy IRQ fallback:
+	 * On some platforms MSI-X/MSI is unavailable or the legacy IRQ path
+	 * does not wake fw_ctrl.wq reliably. In that case, poll the legacy
+	 * event mailbox directly and synthesize the firmware-ack completion.
+	 */
+	if (memx_dev->use_legacy_irq) {
+		do {
+			u32 event = memx_sram_read(memx_dev, MEMRYX_LEGACY_MSG_ADDR);
+			u32 msix_idx = event >> 8;
+
+			if (memx_dev->mpu_data.fw_ctrl.is_abort) {
+				memx_dev->mpu_data.fw_ctrl.is_abort = 0;
+				return -ERESTARTSYS;
+			}
+
+			/*
+			 * In legacy mode, firmware ACK is encoded as event>>8 == 0
+			 * (same interpretation used by the legacy IRQ handler).
+			 */
+			if ((event != MEMRYX_LEGACY_CLEAR_MSG) && (msix_idx == 0)) {
+				pr_info("memryx: legacy fw ack event=0x%08X\n", event);
+
+				spin_lock(&memx_dev->mpu_data.fw_ctrl.lock);
+				memx_dev->mpu_data.fw_ctrl.indicator = 0;
+				spin_unlock(&memx_dev->mpu_data.fw_ctrl.lock);
+
+				/* Clear mailbox so firmware can send the next event */
+				memx_sram_write(memx_dev, MEMRYX_LEGACY_MSG_ADDR, MEMRYX_LEGACY_CLEAR_MSG);
+				return 0;
+			}
+
+			msleep(100);
+			fail_count++;
+			pr_err("memryx: wait_for_fw_ack(legacy): wait timeout 100ms, retrying again\n");
+		} while (fail_count < (FAIL_ACK_COUNT * 10));
+
+		pr_err("memryx: wait_for_fw_ack(legacy): failed!\n");
 		return -ENODEV;
 	}
 	// check until received cmd process done msix
