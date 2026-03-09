@@ -258,6 +258,9 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 		return ret;
 	}
 
+	/* Default assumption: not using legacy IRQ unless we explicitly fall back */
+	memx_dev->use_legacy_irq = 0;
+	
 	if(memx_dev->msix) {
 		irq_request_or_err = pci_alloc_irq_vectors(memx_dev->pDev, 1, MEMRYX_MAX_MSIX_NUMBER, PCI_IRQ_MSIX);
 
@@ -286,17 +289,20 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 					pr_err("memryx: ini pcie legacy irq: fail to call pci_alloc_irq_vectors(%d)\n", irq_request_or_err);
 					return -1;
 				} else {
+					memx_dev->use_legacy_irq = 1;
 					pr_info("memryx: alloc legacy %d", irq_request_or_err);
 				}
 			} else {
+				memx_dev->use_legacy_irq = 0;
 				pr_info("memryx: alloc msi %d", irq_request_or_err);
 			}
 		} else {
+			memx_dev->use_legacy_irq = 0;
 			pr_info("memryx: alloc msix %d", irq_request_or_err);
 		}
-#ifdef DEBUG
+
 		memx_dump_msix_config_info(memx_dev);
-#endif
+
 	} else {
 		irq_request_or_err = pci_alloc_irq_vectors(memx_dev->pDev, 1, MEMRYX_MAX_MSI_NUMBER, PCI_IRQ_MSI);
 
@@ -316,9 +322,11 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 				pr_err("memryx: ini pcie legacy irq: fail to call pci_alloc_irq_vectors(%d)\n", irq_request_or_err);
 				return -1;
 			} else {
+				memx_dev->use_legacy_irq = 1;
 				pr_info("memryx: alloc legacy %d", irq_request_or_err);
 			}
 		} else {
+			memx_dev->use_legacy_irq = 0;
 			pr_info("memryx: alloc msi %d", irq_request_or_err);
 		}
 	}
