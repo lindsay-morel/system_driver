@@ -1,0 +1,83 @@
+#!/usr/bin/make -f
+
+DH_VERBOSE = 1
+
+include /usr/share/dpkg/pkg-info.mk
+include /usr/share/dpkg/architecture.mk
+
+%:
+	dh $@ --with dkms
+
+ifeq ($(DEB_HOST_GNU_CPU),x86_64)
+override_dh_install:
+	dh_install src/include/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/include
+	dh_install src/pcie/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/pcie
+	dh_install src/usb/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/usb
+	dh_install src/include/memx_ioctl.h usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/pcie/
+	dh_install src/include/memx_ioctl.h usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/usb/
+	dh_install libmemx.so.$(DEB_VERSION_UPSTREAM) usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/
+	dh_link usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/libmemx.so.$(DEB_VERSION_UPSTREAM) usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/libmemx.so
+	dh_install udriver/debian/temp/include/memx/ usr/include/
+	dh_install fw/*.bin lib/firmware/
+	dh_install memx-sysfs.conf etc/modules-load.d/
+	dh_install mx_set_powermode usr/sbin/
+	dh_install flash_update_tool/x86_64/mxfw_pcie_update_flash usr/sbin/
+	dh_install flash_update_tool/x86_64/mxfw_check_version usr/sbin/
+	dh_install flash_update_tool/x86_64/mxfw_read_fwver usr/bin/
+	dh_install power.conf etc/memryx/
+else ifeq ($(DEB_HOST_GNU_CPU),riscv64)
+override_dh_install:
+	dh_install src/include/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/include
+	dh_install src/pcie/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/pcie
+	dh_install src/usb/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/usb
+	dh_install src/include/memx_ioctl.h usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/pcie/
+	dh_install src/include/memx_ioctl.h usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/usb/
+	dh_install libmemx.so.$(DEB_VERSION_UPSTREAM) usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/
+	dh_link usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/libmemx.so.$(DEB_VERSION_UPSTREAM) usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/libmemx.so
+	dh_install udriver/debian/temp/include/memx/ usr/include/
+	dh_install fw/*.bin lib/firmware/
+	dh_install memx-sysfs.conf etc/modules-load.d/
+	dh_install mx_set_powermode usr/sbin/
+	dh_install flash_update_tool/riscv64/mxfw_pcie_update_flash usr/sbin/
+	dh_install flash_update_tool/riscv64/mxfw_check_version usr/sbin/
+	dh_install flash_update_tool/riscv64/mxfw_read_fwver usr/bin/
+	dh_install power.conf etc/memryx/
+else
+override_dh_install:
+	dh_install src/include/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/include
+	dh_install src/pcie/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/pcie
+	dh_install src/usb/* usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/usb
+	dh_install src/include/memx_ioctl.h usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/pcie/
+	dh_install src/include/memx_ioctl.h usr/src/memx-drivers-$(DEB_VERSION_UPSTREAM)/usb/
+	dh_install libmemx.so.$(DEB_VERSION_UPSTREAM) usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/
+	dh_link usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/libmemx.so.$(DEB_VERSION_UPSTREAM) usr/lib/$(DEB_HOST_GNU_CPU)-linux-gnu/libmemx.so
+	dh_install udriver/debian/temp/include/memx/ usr/include/
+	dh_install fw/*.bin lib/firmware/
+	dh_install memx-sysfs.conf etc/modules-load.d/
+	dh_install mx_set_powermode usr/sbin/
+	dh_install flash_update_tool/aarch64/mxfw_pcie_update_flash usr/sbin/
+	dh_install flash_update_tool/aarch64/mxfw_check_version usr/sbin/
+	dh_install flash_update_tool/aarch64/mxfw_read_fwver usr/bin/
+	dh_install power.conf etc/memryx/
+	dh_install mx_arm_setup usr/sbin/
+
+endif
+
+override_dh_dkms:
+	dh_dkms -V $(DEB_VERSION_UPSTREAM)
+
+override_dh_auto_configure:
+	dh_auto_configure	
+
+override_dh_auto_build:
+override_dh_auto_test:
+
+ifeq ($(DEB_HOST_GNU_CPU),x86_64)
+override_dh_auto_install:
+	./udriver_build.sh && mv -v udriver/debian/temp/lib/libmemx.so libmemx.so.$(DEB_VERSION_UPSTREAM) && cp -v mx_set_powermode600 mx_set_powermode && cp -v power.conf600 power.conf
+else
+override_dh_auto_install:
+	./udriver_build.sh && mv -v udriver/debian/temp/lib/libmemx.so libmemx.so.$(DEB_VERSION_UPSTREAM) && cp -v mx_set_powermode500 mx_set_powermode && cp -v power.conf500 power.conf
+endif
+
+override_dh_auto_clean:

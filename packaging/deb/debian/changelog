@@ -1,0 +1,172 @@
+memx-drivers (2.0.6-1) stable; urgency=medium
+
+  * Add get_utilization API
+
+ -- MemryX <no-reply@memryx.com>  Wed, 17 Sep 2025 00:00:00 +0000
+
+memx-drivers (2.0.5-4) stable; urgency=medium
+
+  * Update frequency/voltage curve
+
+ -- MemryX <no-reply@memryx.com>  Thu, 11 Sep 2025 00:00:00 +0000
+
+memx-drivers (2.0.5-3) stable; urgency=medium
+
+  * Add udev rule to tweak dev node permissions
+
+ -- MemryX <no-reply@memryx.com>  Tue, 9 Sep 2025 00:00:00 +0000
+
+memx-drivers (2.0.5-2) stable; urgency=medium
+
+  * Rebuild for the sake of 2.0.5 runtimes
+
+ -- MemryX <no-reply@memryx.com>  Fri, 5 Sep 2025 00:00:00 +0000
+
+memx-drivers (2.0.1-1) stable; urgency=medium
+
+  * Increase max number of devices to 16
+
+ -- MemryX <no-reply@memryx.com>  Tue, 5 Aug 2025 00:00:00 +0000
+
+memx-drivers (2.0.0-8.2) stable; urgency=medium
+
+  * restored missing RK3588 dtbo
+
+ -- MemryX <no-reply@memryx.com>  Wed, 30 Jul 2025 00:00:00 +0000
+
+memx-drivers (2.0.0-8) stable; urgency=medium
+
+  * SDK 2.0.0 release
+
+ -- MemryX <no-reply@memryx.com>  Mon, 28 Jul 2025 00:00:00 +0000
+
+memx-drivers (1.2.1-1) stable; urgency=medium
+
+  * hwmon temps bugfix
+  * Rename power mode options to just say what the freq is
+
+ -- MemryX <no-reply@memryx.com>  Mon, 17 Mar 2025 00:00:00 +0000
+
+memx-drivers (1.2.0-4) stable; urgency=medium
+
+  * SDK 1.2 stable release
+  * Temperature reporting bugfixes (firmware + hwmon edit)
+
+ -- MemryX <no-reply@memryx.com>  Tue, 4 Mar 2025 00:00:00 +0000
+
+memx-drivers (1.2.0-3) testing; urgency=medium
+
+  * Fix ARM "catch-22" situations with PCIe BARs and mx_arm_setup
+
+ -- MemryX <no-reply@memryx.com>  Sat, 1 Mar 2025 00:00:00 +0000
+
+memx-drivers (1.2.0-1) testing; urgency=medium
+
+  * Full 1.2 driver test build
+
+ -- MemryX <no-reply@memryx.com>  Mon, 10 Feb 2025 00:00:00 +0000
+
+memx-drivers (1.1.5-3) stable; urgency=medium
+
+  * temporarily revert firmware back to 1.1 due to high idle temps
+
+ -- MemryX <no-reply@memryx.com>  Fri, 7 Feb 2025 00:00:00 +0000
+
+memx-drivers (1.1.5-2) stable; urgency=medium
+
+  * postinst bugfix
+
+ -- MemryX <no-reply@memryx.com>  Thu, 6 Feb 2025 00:00:00 +0000
+
+memx-drivers (1.1.5-1) stable; urgency=medium
+
+  * Backport 1.2's firmware and release as Version 1.1.5
+
+ -- MemryX <no-reply@memryx.com>  Tue, 4 Feb 2025 00:00:00 +0000
+
+memx-drivers (1.1.1-1) stable; urgency=medium
+
+  * skip firmware checks if running in a container or VM
+
+ -- MemryX <no-reply@memryx.com>  Mon, 13 Jan 2025 00:00:00 +0000
+
+memx-drivers (1.1.0-10) stable; urgency=medium
+
+  * SDK 1.1 release
+
+ -- MemryX <no-reply@memryx.com>  Sun, 22 Dec 2024 00:00:00 +0000
+
+memx-drivers (1.1.0-9) testing; urgency=medium
+
+  * tweaked kdriver dmesg messages
+  * upgrade message condition checks
+
+ -- tim <tim@arbor1>  Fri, 20 Dec 2024 00:00:00 +0000
+
+memx-drivers (1.1.0-8) testing; urgency=medium
+
+  * riscv64 flash tools
+  * fixed riscv64 build
+  * upgrade message tweak
+
+ -- tim <tim@arbor1>  Wed, 11 Dec 2024 00:00:00 +0000
+
+memx-drivers (1.1.0-7) testing; urgency=medium
+
+  * preinst/postinst config tweaks
+
+ -- tim <tim@arbor1>  Thu, 5 Dec 2024 00:00:00 +0000
+
+memx-drivers (1.1.0-6) testing; urgency=medium
+
+  * Improved messaging around upgrades
+
+ -- tim <tim@arbor1>  Wed, 4 Dec 2024 00:00:00 +0000
+
+memx-drivers (1.1.0-5) testing; urgency=medium
+
+  * Automatic MXMF firmware update
+
+ -- tim <tim@arbor1>  Sun, 1 Dec 2024 00:00:02 +0000
+
+memx-drivers (1.1.0-3) testing; urgency=medium
+
+  * SDK 1.1 release with removed udev dep
+
+ -- tim <tim@arbor1>  Sun, 1 Dec 2024 00:00:01 +0000
+
+memx-drivers (1.1.0-3) testing; urgency=medium
+
+  * SDK 1.1 release (5p6)
+
+ -- tim <tim@arbor1>  Mon, 25 Nov 2024 00:00:01 +0000
+
+memx-drivers (1.1.0-1) testing; urgency=medium
+
+  * SDK 1.1 release (5p4)
+
+ -- tim <tim@arbor1>  Mon, 18 Nov 2024 00:00:01 +0000
+
+memx-drivers (1.0.0-4) testing; urgency=medium
+
+  * autobuild_19:00:49
+
+ -- tim <tim@arbor1>  Tue, 10 Sep 2024 19:00:49 +0000
+
+memx-drivers (1.0.0-3) testing; urgency=medium
+
+  * autobuild_18:47:32
+
+ -- tim <tim@arbor1>  Tue, 10 Sep 2024 18:47:32 +0000
+
+memx-drivers (1.0.0-2) testing; urgency=medium
+
+  * autobuild_18:42:05
+
+ -- tim <tim@arbor1>  Tue, 10 Sep 2024 18:42:05 +0000
+
+memx-drivers (1.0.0-1) testing; urgency=medium
+
+  * autobuild_20:54:20
+
+ -- tim <tim@arbor1>  Mon, 09 Sep 2024 20:54:20 +0000

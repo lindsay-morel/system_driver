@@ -1,0 +1,38 @@
+#!/bin/sh
+
+
+# Load debconf library
+. /usr/share/debconf/confmodule
+
+# Ask the user the configuration question ONLY if we are upgrading
+case "$1" in
+    upgrade)
+        # only prompt if we're upgrading to a new Major release
+        FROMVERSION=$(echo $2 | awk -F. '{print $1 "." $2}')
+        TOVERSION=$(echo $3 | awk -F. '{print $1 "." $2}')
+
+        if [ "$FROMVERSION" != "$TOVERSION" ]; then
+
+            db_fset memx-drivers/requireAck seen false
+            db_input critical memx-drivers/requireAck
+            db_go
+            
+            # Check the user's response
+            db_get memx-drivers/requireAck
+            if [ "$RET" != "true" ]; then
+                echo "User declined upgrade to $3. Use 'sudo apt-mark hold memx-drivers' to prevent having to repeat this and to stay on SDK $2 until you unhold."
+                exit 1
+            fi
+        else
+            # Upgrading within the same Major series -- no prompt needed
+            db_set memx-drivers/requireAck true
+            db_fset memx-drivers/requireAck seen true
+        fi
+
+        ;;
+    install)
+        # if we're a fresh install, auto-set "Yes"
+        db_set memx-drivers/requireAck true
+        db_fset memx-drivers/requireAck seen true
+        ;;
+esac

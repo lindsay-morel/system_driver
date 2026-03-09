@@ -1,0 +1,5 @@
+Template: memx-drivers/requireAck
+Type: boolean
+Default: false
+Description: Are you ready to upgrade the memx-driver package?
+ *NOTE* This does not upgrade the SDK Tools Python pip package! You will need to pip --upgrade them separately; see https://developer.memryx.com/get_started/install_tools.html for instructions. Please abort this install if you're not ready to switch to the latest SDK just yet.

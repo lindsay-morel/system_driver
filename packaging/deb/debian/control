@@ -1,0 +1,8 @@
+Source: memx-drivers
+Maintainer: MemryX <no-reply@memryx.com>
+Build-Depends: debhelper (>= 10), dkms, libusb-1.0-0-dev, libpci-dev, zlib1g-dev, virt-what
+
+Package: memx-drivers
+Architecture: amd64 arm64 riscv64
+Depends: dkms, pciutils, dialog, virt-what, ${shlibs:Depends}, ${misc:Depends}
+Description: MemryX Kernel Driver and Driver Library for MX3
