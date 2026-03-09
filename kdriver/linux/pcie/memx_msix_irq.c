@@ -301,7 +301,9 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 			pr_info("memryx: alloc msix %d", irq_request_or_err);
 		}
 
-		memx_dump_msix_config_info(memx_dev);
+#ifdef DEBUG
+	memx_dump_msix_config_info(memx_dev);
+#endif
 
 	} else {
 		irq_request_or_err = pci_alloc_irq_vectors(memx_dev->pDev, 1, MEMRYX_MAX_MSI_NUMBER, PCI_IRQ_MSI);
