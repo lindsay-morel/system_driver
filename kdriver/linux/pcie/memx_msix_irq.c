@@ -104,69 +104,69 @@ static irqreturn_t memx_firmware_msix_ack_isr(s32 irq, void *data)
 	return IRQ_HANDLED;
 }
 
-static irqreturn_t memx_egress_dcore_isr(s32 irq, void *data)
-{
-	if (data) {
-		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
+// static irqreturn_t memx_egress_dcore_isr(s32 irq, void *data)
+// {
+// 	if (data) {
+// 		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
 
-		if (memx_dev) {
-			s32 msix_idx = -1;
-			s32 chip_idx = -1;
-			// memx_disable_msix(memx_dev);
-			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
-			if (msix_idx == -1) {
-				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
-				// memx_enable_msix(memx_dev);
-				return IRQ_HANDLED;
-			}
-			g_hitcount_info.msi_hitcount[msix_idx]++;
-			chip_idx = (msix_idx - 1) >> 1;
+// 		if (memx_dev) {
+// 			s32 msix_idx = -1;
+// 			s32 chip_idx = -1;
+// 			// memx_disable_msix(memx_dev);
+// 			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
+// 			if (msix_idx == -1) {
+// 				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
+// 				// memx_enable_msix(memx_dev);
+// 				return IRQ_HANDLED;
+// 			}
+// 			g_hitcount_info.msi_hitcount[msix_idx]++;
+// 			chip_idx = (msix_idx - 1) >> 1;
 
-#ifdef DEBUG
-			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
-			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
-#endif
-			if (!kfifo_in_locked(&memx_dev->rx_msix_fifo, &chip_idx, sizeof(s32), &memx_dev->mpu_data.rx_ctrl.lock))
-				pr_err("memryx: isr: kfifo_in fail, rx_msix_fifo is full\n");
+// #ifdef DEBUG
+// 			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
+// 			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
+// #endif
+// 			if (!kfifo_in_locked(&memx_dev->rx_msix_fifo, &chip_idx, sizeof(s32), &memx_dev->mpu_data.rx_ctrl.lock))
+// 				pr_err("memryx: isr: kfifo_in fail, rx_msix_fifo is full\n");
 
-			wake_up_interruptible(&memx_dev->mpu_data.rx_ctrl.wq);
-			// memx_enable_msix(memx_dev);
-		}
-	}
-	return IRQ_HANDLED;
-}
+// 			wake_up_interruptible(&memx_dev->mpu_data.rx_ctrl.wq);
+// 			// memx_enable_msix(memx_dev);
+// 		}
+// 	}
+// 	return IRQ_HANDLED;
+// }
 
-static irqreturn_t memx_ingress_dcore_isr(s32 irq, void *data)
-{
-	if (data) {
-		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
+// static irqreturn_t memx_ingress_dcore_isr(s32 irq, void *data)
+// {
+// 	if (data) {
+// 		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
 
-		if (memx_dev) {
-			s32 msix_idx = -1;
-			u32 chip_id = 0;
+// 		if (memx_dev) {
+// 			s32 msix_idx = -1;
+// 			u32 chip_id = 0;
 
-			// memx_disable_msix(memx_dev);
-			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
-			if (msix_idx == -1) {
-				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
-				// memx_enable_msix(memx_dev);
-				return IRQ_HANDLED;
-			}
-			g_hitcount_info.msi_hitcount[msix_idx]++;
-#ifdef DEBUG
-			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
-			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
-#endif
-			chip_id = (msix_idx - 1) >> 1;
-			spin_lock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
-			memx_dev->mpu_data.tx_ctrl[chip_id].indicator = chip_id;
-			spin_unlock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
-			wake_up_interruptible(&memx_dev->mpu_data.tx_ctrl[chip_id].wq);
-			// memx_enable_msix(memx_dev);
-		}
-	}
-	return IRQ_HANDLED;
-}
+// 			// memx_disable_msix(memx_dev);
+// 			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
+// 			if (msix_idx == -1) {
+// 				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
+// 				// memx_enable_msix(memx_dev);
+// 				return IRQ_HANDLED;
+// 			}
+// 			g_hitcount_info.msi_hitcount[msix_idx]++;
+// #ifdef DEBUG
+// 			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
+// 			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
+// #endif
+// 			chip_id = (msix_idx - 1) >> 1;
+// 			spin_lock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
+// 			memx_dev->mpu_data.tx_ctrl[chip_id].indicator = chip_id;
+// 			spin_unlock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
+// 			wake_up_interruptible(&memx_dev->mpu_data.tx_ctrl[chip_id].wq);
+// 			// memx_enable_msix(memx_dev);
+// 		}
+// 	}
+// 	return IRQ_HANDLED;
+// }
 
 // static struct memx_irq_entry g_msix_entries[MEMRYX_MAX_MSIX_NUMBER] = {
 // 	{"Firmware MSI-X Acknowledge Notification", memx_firmware_msix_ack_isr},
