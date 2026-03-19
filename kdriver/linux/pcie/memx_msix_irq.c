@@ -143,105 +143,105 @@ static irqreturn_t memx_firmware_msix_ack_isr(s32 irq, void *data)
 	return IRQ_HANDLED;
 }
 
-// static irqreturn_t memx_egress_dcore_isr(s32 irq, void *data)
-// {
-// 	if (data) {
-// 		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
+static irqreturn_t memx_egress_dcore_isr(s32 irq, void *data)
+{
+	if (data) {
+		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
 
-// 		if (memx_dev) {
-// 			s32 msix_idx = -1;
-// 			s32 chip_idx = -1;
-// 			// memx_disable_msix(memx_dev);
-// 			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
-// 			if (msix_idx == -1) {
-// 				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
-// 				// memx_enable_msix(memx_dev);
-// 				return IRQ_HANDLED;
-// 			}
-// 			g_hitcount_info.msi_hitcount[msix_idx]++;
-// 			chip_idx = (msix_idx - 1) >> 1;
+		if (memx_dev) {
+			s32 msix_idx = -1;
+			s32 chip_idx = -1;
+			// memx_disable_msix(memx_dev);
+			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
+			if (msix_idx == -1) {
+				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
+				// memx_enable_msix(memx_dev);
+				return IRQ_HANDLED;
+			}
+			g_hitcount_info.msi_hitcount[msix_idx]++;
+			chip_idx = (msix_idx - 1) >> 1;
 
-// #ifdef DEBUG
-// 			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
-// 			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
-// #endif
-// 			if (!kfifo_in_locked(&memx_dev->rx_msix_fifo, &chip_idx, sizeof(s32), &memx_dev->mpu_data.rx_ctrl.lock))
-// 				pr_err("memryx: isr: kfifo_in fail, rx_msix_fifo is full\n");
+#ifdef DEBUG
+			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
+			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
+#endif
+			if (!kfifo_in_locked(&memx_dev->rx_msix_fifo, &chip_idx, sizeof(s32), &memx_dev->mpu_data.rx_ctrl.lock))
+				pr_err("memryx: isr: kfifo_in fail, rx_msix_fifo is full\n");
 
-// 			wake_up_interruptible(&memx_dev->mpu_data.rx_ctrl.wq);
-// 			// memx_enable_msix(memx_dev);
-// 		}
-// 	}
-// 	return IRQ_HANDLED;
-// }
+			wake_up_interruptible(&memx_dev->mpu_data.rx_ctrl.wq);
+			// memx_enable_msix(memx_dev);
+		}
+	}
+	return IRQ_HANDLED;
+}
 
-// static irqreturn_t memx_ingress_dcore_isr(s32 irq, void *data)
-// {
-// 	if (data) {
-// 		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
+static irqreturn_t memx_ingress_dcore_isr(s32 irq, void *data)
+{
+	if (data) {
+		struct memx_pcie_dev *memx_dev = (struct memx_pcie_dev *)data;
 
-// 		if (memx_dev) {
-// 			s32 msix_idx = -1;
-// 			u32 chip_id = 0;
+		if (memx_dev) {
+			s32 msix_idx = -1;
+			u32 chip_id = 0;
 
-// 			// memx_disable_msix(memx_dev);
-// 			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
-// 			if (msix_idx == -1) {
-// 				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
-// 				// memx_enable_msix(memx_dev);
-// 				return IRQ_HANDLED;
-// 			}
-// 			g_hitcount_info.msi_hitcount[msix_idx]++;
-// #ifdef DEBUG
-// 			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
-// 			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
-// #endif
-// 			chip_id = (msix_idx - 1) >> 1;
-// 			spin_lock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
-// 			memx_dev->mpu_data.tx_ctrl[chip_id].indicator = chip_id;
-// 			spin_unlock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
-// 			wake_up_interruptible(&memx_dev->mpu_data.tx_ctrl[chip_id].wq);
-// 			// memx_enable_msix(memx_dev);
-// 		}
-// 	}
-// 	return IRQ_HANDLED;
-// }
+			// memx_disable_msix(memx_dev);
+			msix_idx = memx_get_msix_idx_by_irq(memx_dev, irq);
+			if (msix_idx == -1) {
+				pr_err("memryx: isr: received non-register msix irq(%d), ignoring it\n", irq);
+				// memx_enable_msix(memx_dev);
+				return IRQ_HANDLED;
+			}
+			g_hitcount_info.msi_hitcount[msix_idx]++;
+#ifdef DEBUG
+			pr_info("memryx: isr: driver processed pci_dev(%0x:%0x), msix irq(%d).\n", memx_dev->pDev->vendor, memx_dev->pDev->device, irq);
+			pr_info("memryx: isr: %d-th msix usage is %s\n", msix_idx, memx_get_msix_usage_by_irq(memx_dev, irq));
+#endif
+			chip_id = (msix_idx - 1) >> 1;
+			spin_lock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
+			memx_dev->mpu_data.tx_ctrl[chip_id].indicator = chip_id;
+			spin_unlock(&memx_dev->mpu_data.tx_ctrl[chip_id].lock);
+			wake_up_interruptible(&memx_dev->mpu_data.tx_ctrl[chip_id].wq);
+			// memx_enable_msix(memx_dev);
+		}
+	}
+	return IRQ_HANDLED;
+}
 
-// static struct memx_irq_entry g_msix_entries[MEMRYX_MAX_MSIX_NUMBER] = {
-// 	{"Firmware MSI-X Acknowledge Notification", memx_firmware_msix_ack_isr},
-// 	{"chip 00 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 00 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 01 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 01 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 02 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 02 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 03 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 03 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 04 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 04 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 05 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 05 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 06 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 06 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 07 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 07 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 08 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 08 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 09 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 09 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 10 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 10 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 11 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 11 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 12 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 12 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 13 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 13 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 14 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 14 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
-// 	{"chip 15 Egress Dcore Done Notification.", memx_egress_dcore_isr},
-// 	{"chip 15 Ingress Dcore Done Notification.", memx_ingress_dcore_isr}
-// };
+static struct memx_irq_entry g_msix_entries[MEMRYX_MAX_MSIX_NUMBER] = {
+	{"Firmware MSI-X Acknowledge Notification", memx_firmware_msix_ack_isr},
+	{"chip 00 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 00 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 01 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 01 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 02 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 02 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 03 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 03 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 04 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 04 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 05 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 05 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 06 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 06 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 07 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 07 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 08 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 08 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 09 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 09 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 10 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 10 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 11 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 11 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 12 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 12 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 13 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 13 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 14 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 14 Ingress Dcore Done Notification.", memx_ingress_dcore_isr},
+	{"chip 15 Egress Dcore Done Notification.", memx_egress_dcore_isr},
+	{"chip 15 Ingress Dcore Done Notification.", memx_ingress_dcore_isr}
+};
 #ifdef DEBUG
 static const char *memx_get_msix_usage_by_irq(struct memx_pcie_dev *memx_dev, s32 irq)
 {
@@ -384,19 +384,19 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 		// else
 		// 	ret = devm_request_irq(&memx_dev->pDev->dev, irq, memx_single_isr_handler, IRQF_SHARED, "MEMX SINGLE ISR Handler", memx_dev);
 		// This enables msi with a single vector - not enough for runtime traffic though (but no more legacy!)
-		if (memx_dev->use_legacy_irq) {
-    		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
-                           memx_single_isr_handler,
-                           IRQF_SHARED,
-                           "MEMX SINGLE ISR Handler",
-                           memx_dev);
-		} else {
-    		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
-                           memx_firmware_msix_ack_isr,
-                           0,
-                           "MEMX MSI ISR Handler",
-                           memx_dev);
-		}
+		// if (memx_dev->use_legacy_irq) {
+  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+  //                          memx_single_isr_handler,
+  //                          IRQF_SHARED,
+  //                          "MEMX SINGLE ISR Handler",
+  //                          memx_dev);
+		// } else {
+  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+  //                          memx_firmware_msix_ack_isr,
+  //                          0,
+  //                          "MEMX MSI ISR Handler",
+  //                          memx_dev);
+		// }
 		//next college try: spoiler it disables msi agai and no kernel folders!
 		// if (memx_dev->use_legacy_irq) {
   //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
@@ -417,6 +417,21 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
   //                          g_msix_entries[idx].name,
   //                          memx_dev);
 		// }
+
+		//one more time for the folks in the back!
+		if (memx_dev->use_legacy_irq || memx_dev->int_info.curr_used_msix_count == 1) {
+    		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+                           memx_single_isr_handler,
+                           IRQF_SHARED,
+                           "MEMX SINGLE ISR Handler",
+                           memx_dev);
+		} else {
+    		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+                           g_msix_entries[idx].handler,
+                           0,
+                           g_msix_entries[idx].name,
+                           memx_dev);
+		}
 			
 		if (ret < 0) {
 			pr_err("memryx: init_msix_irq: fail to call devm_request_irq(%d).\n", ret);
