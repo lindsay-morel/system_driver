@@ -384,39 +384,39 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 		// else
 		// 	ret = devm_request_irq(&memx_dev->pDev->dev, irq, memx_single_isr_handler, IRQF_SHARED, "MEMX SINGLE ISR Handler", memx_dev);
 		// This enables msi with a single vector - not enough for runtime traffic though (but no more legacy!)
-		// if (memx_dev->use_legacy_irq) {
-  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
-  //                          memx_single_isr_handler,
-  //                          IRQF_SHARED,
-  //                          "MEMX SINGLE ISR Handler",
-  //                          memx_dev);
-		// } else {
-  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
-  //                          memx_firmware_msix_ack_isr,
-  //                          0,
-  //                          "MEMX MSI ISR Handler",
-  //                          memx_dev);
-		// }
-		//next college try: spoiler it disables msi agai and no kernel folders!
 		if (memx_dev->use_legacy_irq) {
     		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
                            memx_single_isr_handler,
                            IRQF_SHARED,
                            "MEMX SINGLE ISR Handler",
                            memx_dev);
-		} else if (memx_dev->int_info.curr_used_msix_count == 1) {
-    		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
-                           memx_single_isr_handler,
-                           0,
-                           "MEMX SINGLE MSI ISR Handler",
-                           memx_dev);
 		} else {
     		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
-                           g_msix_entries[idx].handler,
+                           memx_firmware_msix_ack_isr,
                            0,
-                           g_msix_entries[idx].name,
+                           "MEMX MSI ISR Handler",
                            memx_dev);
 		}
+		//next college try: spoiler it disables msi agai and no kernel folders!
+		// if (memx_dev->use_legacy_irq) {
+  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+  //                          memx_single_isr_handler,
+  //                          IRQF_SHARED,
+  //                          "MEMX SINGLE ISR Handler",
+  //                          memx_dev);
+		// } else if (memx_dev->int_info.curr_used_msix_count == 1) {
+  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+  //                          memx_single_isr_handler,
+  //                          0,
+  //                          "MEMX SINGLE MSI ISR Handler",
+  //                          memx_dev);
+		// } else {
+  //   		ret = devm_request_irq(&memx_dev->pDev->dev, irq,
+  //                          g_msix_entries[idx].handler,
+  //                          0,
+  //                          g_msix_entries[idx].name,
+  //                          memx_dev);
+		// }
 
 		//one more time for the folks in the back!
 		// if (memx_dev->use_legacy_irq || memx_dev->int_info.curr_used_msix_count == 1) {
