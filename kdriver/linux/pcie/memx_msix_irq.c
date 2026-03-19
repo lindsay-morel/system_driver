@@ -11,6 +11,45 @@ static void memx_dump_msix_config_info(struct memx_pcie_dev *memx_dev);
 #endif
 static s32 memx_get_msix_idx_by_irq(struct memx_pcie_dev *memx_dev, s32 irq);
 
+static irqreturn_t memx_single_msi_isr_handler(int irq, void *data)
+{
+    struct memx_pcie_dev *memx_dev = data;
+    u32 event;
+    s32 msix_idx;
+    s32 chip_idx;
+
+    if (!memx_dev)
+        return IRQ_HANDLED;
+
+    event = memx_sram_read(memx_dev, MEMRYX_LEGACY_MSG_ADDR);
+
+    if (event == MEMRYX_LEGACY_CLEAR_MSG)
+        return IRQ_HANDLED;
+
+    msix_idx = event >> 8;
+    chip_idx = (msix_idx - 1) >> 1;
+
+    if (msix_idx == 0) {
+        spin_lock(&memx_dev->mpu_data.fw_ctrl.lock);
+        memx_dev->mpu_data.fw_ctrl.indicator = msix_idx;
+        spin_unlock(&memx_dev->mpu_data.fw_ctrl.lock);
+        wake_up_interruptible(&memx_dev->mpu_data.fw_ctrl.wq);
+    } else if (msix_idx & 0x1) {
+        if (!kfifo_in_locked(&memx_dev->rx_msix_fifo, &chip_idx, sizeof(s32),
+                             &memx_dev->mpu_data.rx_ctrl.lock))
+            pr_err("memryx: isr: kfifo_in fail, rx_msix_fifo is full\n");
+
+        wake_up_interruptible(&memx_dev->mpu_data.rx_ctrl.wq);
+    } else {
+        spin_lock(&memx_dev->mpu_data.tx_ctrl[chip_idx].lock);
+        memx_dev->mpu_data.tx_ctrl[chip_idx].indicator = chip_idx;
+        spin_unlock(&memx_dev->mpu_data.tx_ctrl[chip_idx].lock);
+        wake_up_interruptible(&memx_dev->mpu_data.tx_ctrl[chip_idx].wq);
+    }
+
+    return IRQ_HANDLED;
+}
+
 static irqreturn_t memx_single_isr_handler(s32 irq, void *data)
 {
 	if (data) {
