@@ -310,7 +310,7 @@ s32 memx_init_msix_irq(struct memx_pcie_dev *memx_dev)
 			
 			pr_info("memryx: msix interrupt number %d not enough try alloc msi interrupt\n", irq_request_or_err);
 
-			irq_request_or_err = pci_alloc_irq_vectors(memx_dev->pDev, 1, MEMRYX_MAX_MSI_NUMBER, PCI_IRQ_MSI);
+			irq_request_or_err = pci_alloc_irq_vectors(memx_dev->pDev, 2, MEMRYX_MAX_MSI_NUMBER, PCI_IRQ_MSI);
 
 			if (irq_request_or_err < MEMRYX_MSI_ALLOW_MIN) {
 				if (irq_request_or_err > 0) {
