@@ -17,7 +17,7 @@
 #define PCIE_NAME "memx_pcie_ai_chip"
 
 #define DEVICE_NODE_NAME "memx%d"
-#define DEVICE_NODE_DEFAULT_ACCESS_RIGHT (0x0666)
+#define DEVICE_NODE_DEFAULT_ACCESS_RIGHT (0666)
 #define DEVICE_CLASS_NAME "memx_cdev"
 
 #define MEMX_PCIE_VENDOR_ID (0x1FE9)
